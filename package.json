@@ -49,5 +49,18 @@
     "titleTemplate": "{classname}-{title}",
     "ancestorSeparator": " › ",
     "usePathForSuiteName": "true"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "playwright.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abhiaws26/learn-jenkins-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abhiaws26/learn-jenkins-app/issues"
+  },
+  "homepage": "https://github.com/Abhiaws26/learn-jenkins-app#readme"
 }
