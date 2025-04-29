@@ -1,27 +1,30 @@
-# Use Node.js 18 base image
-FROM node:18
+FROM node:18-alpine
 
-# Create a non-root user (if not using one already)
-RUN useradd -m node
+# Ensure npm cache has correct permissions
+RUN mkdir -p /home/node/.npm && chown -R node:node /home/node/.npm
 
-# Change the ownership of the npm cache directory to the 'node' user
-RUN chown -R node:node /home/node/.npm
-
-# Set the user to 'node' for running npm commands
-USER node
-
-# Optionally, set npm cache location to a directory the node user owns
-RUN npm config set cache /home/node/.npm
-
-# Set the working directory for the app
+# Set working directory
 WORKDIR /app
 
-# Copy your application files into the container
-COPY . .
+# Copy package files and fix ownership
+COPY package*.json ./
+RUN chown node:node /app/package*.json
 
-# Install dependencies using npm
+# Fix ownership of /app directory
+RUN chown -R node:node /app
+
+# Switch to non-root user
+USER node
+
+# Install dependencies
 RUN npm install
 
-# Run your app
+# Copy the rest of the application (as non-root)
+COPY --chown=node:node . .
+
+# Expose application port
+EXPOSE 3000
+
+# Start the app
 CMD ["npm", "start"]
 
