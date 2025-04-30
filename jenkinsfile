@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Install and Build') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test Build Output') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -48,12 +48,34 @@ pipeline {
             }
             steps {
                 sh '''
+                    # Start the app in the background
                     npm install -g serve
                     serve -s build &
+                    
+                    # Wait for the server to be ready
                     sleep 15
+                    
+                    # Run Playwright tests
                     npx playwright test
                 '''
             }
+        }
+
+        // Optional: clean up docker space before or after heavy stages
+        stage('Docker Cleanup') {
+            agent any
+            steps {
+                sh '''
+                    docker system prune -af --volumes || true
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up workspace and temporary files...'
+            deleteDir()
         }
     }
 }
