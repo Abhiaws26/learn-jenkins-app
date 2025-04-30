@@ -1,27 +1,38 @@
-pipeline {
+pipeline{
     agent any
-    stages {
-        stage('build-stage') {
-            agent {
-                docker {
+    stages{
+        stage('build-stage'){
+            agent{
+                docker{
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
-            environment {
-                NPM_CONFIG_CACHE = './.npm-cache'
-            }
-            steps {
+            steps{
                 sh '''
                     ls -la
                     npm --version
                     node --version
                     npm ci
                     npm run build
-                    ls -la
+                '''
+
+            }
+        }
+        stage('test'){
+            agent{
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps{
+                sh'''
+                    test -f build/index.html
+                    npm text
                 '''
             }
         }
+        }
     }
-}
 
