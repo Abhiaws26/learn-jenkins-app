@@ -1,7 +1,8 @@
 pipeline {
     agent any
+
     stages {
-        stage('build-stage') {
+        stage('Install and Build') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -22,20 +23,21 @@ pipeline {
                 '''
             }
         }
-                stage('build-stage') {
-                    agent {
-                        docker {
-                            image 'node:18-alpine'
-                            reuseNode true
+
+        stage('Test Build Output') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
                 }
             }
-            steps{
+            steps {
                 sh '''
                     test -f build/index.html
-                    nmp test
+                    npm test
                 '''
             }
+        }
     }
-
 }
 
