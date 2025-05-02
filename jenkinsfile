@@ -11,6 +11,7 @@ pipeline {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
+                    args '-v /data:/data'
                 }
             }
             steps {
@@ -30,10 +31,11 @@ pipeline {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
+                    args '-v /data:/data'
                 }
             }
             environment {
-                TMPDIR = './.tmp'
+                TMPDIR = '/data/tmp'
             }
             steps {
                 sh '''
@@ -49,6 +51,7 @@ pipeline {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.51.0-noble'
                     reuseNode true
+                    args '-v /data:/data'
                 }
             }
             environment {
@@ -67,6 +70,13 @@ pipeline {
         }
 
         stage('Docker Pull (Optional)') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                    args '-v /data:/data'
+                }
+            }
             environment {
                 DOCKER_TMPDIR = '/data/docker-tmp'
             }
