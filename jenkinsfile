@@ -32,8 +32,12 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                TMPDIR = './.tmp'
+            }
             steps {
                 sh '''
+                    mkdir -p "$TMPDIR"
                     test -f build/index.html
                     npm test
                 '''
@@ -49,10 +53,11 @@ pipeline {
             }
             environment {
                 DOCKER_TMPDIR = '/data/docker-tmp'
+                TMPDIR = '/data/tmp'
             }
             steps {
                 sh '''
-                    mkdir -p "$DOCKER_TMPDIR"
+                    mkdir -p "$DOCKER_TMPDIR" "$TMPDIR"
                     npm install -g serve
                     serve -s build &
                     sleep 15
