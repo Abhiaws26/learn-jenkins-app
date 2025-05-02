@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        NPM_CONFIG_CACHE = './.npm-cache'
+    }
+
     stages {
         stage('Install and Build') {
             agent {
@@ -8,9 +12,6 @@ pipeline {
                     image 'node:18-alpine'
                     reuseNode true
                 }
-            }
-            environment {
-                NPM_CONFIG_CACHE = './.npm-cache'
             }
             steps {
                 sh '''
@@ -39,45 +40,29 @@ pipeline {
             }
         }
 
-        stage('e2e') {
+        stage('End-to-End Tests') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.52.0-noble-chrome'
-
+                    image 'mcr.microsoft.com/playwright:v1.51.0-noble'
                     reuseNode true
                 }
             }
             steps {
                 sh '''
-                    echo "e2e has began"
-                    # Start the app in the background
                     npm install -g serve
                     serve -s build &
-                    
-                    # Wait for the server to be ready
                     sleep 15
-                    
-                    # Run Playwright tests
                     npx playwright test
                 '''
             }
         }
 
-        // Optional: clean up docker space before or after heavy stages
-        stage('Docker Cleanup') {
-            agent any
+        stage('Docker Pull (Optional)') {
             steps {
-                sh '''
-                    docker system prune -af --volumes || true
-                '''
+                script {
+                    docker.image('mcr.microsoft.com/playwright:v1.51.0-noble').pull()
+                }
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up workspace and temporary files...'
-            deleteDir()
         }
     }
 }
