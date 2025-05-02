@@ -47,8 +47,12 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                DOCKER_TMPDIR = '/data/docker-tmp'
+            }
             steps {
                 sh '''
+                    mkdir -p "$DOCKER_TMPDIR"
                     npm install -g serve
                     serve -s build &
                     sleep 15
@@ -58,10 +62,14 @@ pipeline {
         }
 
         stage('Docker Pull (Optional)') {
+            environment {
+                DOCKER_TMPDIR = '/data/docker-tmp'
+            }
             steps {
-                script {
-                    docker.image('mcr.microsoft.com/playwright:v1.51.0-noble').pull()
-                }
+                sh '''
+                    mkdir -p "$DOCKER_TMPDIR"
+                    docker pull mcr.microsoft.com/playwright:v1.51.0-noble
+                '''
             }
         }
     }
