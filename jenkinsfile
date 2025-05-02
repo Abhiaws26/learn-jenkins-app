@@ -48,6 +48,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo "e2e has began"
                     # Start the app in the background
                     npm install -g serve
                     serve -s build &
