@@ -54,8 +54,9 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install -g netlify-cli --unsafe-perm  # Use --unsafe-perm to avoid permission issues
-                    netlify --version
+                    npm install netlify-cli
+                    npx netlify --version
+                    # Optional: use npx netlify deploy --site <site-id> --auth <token> --prod
                 '''
             }
         }
