@@ -1,20 +1,55 @@
-stage('deploy') {
-    agent {
-        docker {
-            image 'node:18'
-            reuseNode true
-            args '-u 0'
+pipeline {
+    agent any
+
+    environment {
+        NPM_CONFIG_CACHE = './.npm-cache'
+    }
+
+    stages {
+        stage('Install and Build') {
+            agent {
+                docker {
+                    image 'node:18'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    ls -la
+                    npm --version
+                    node --version
+                    npm config set cache /tmp/.npm-cache --global  # Set cache to a writable directory
+                    npm ci
+                    npm run build
+                    ls -la
+                '''
+            }
+        }
+        stage('approval'){
+            steps{
+                timeout (time : 3 , timeout units : minutes){
+                input message: 'DO YOU WISH TO TEST THE PIPELINE ', ok: 'YES , I AM SURE'
+                }
+            }
+        }
+
+        stage('Test Build Output') {
+            agent {
+                docker {
+                    image 'node:18'
+                    reuseNode true
+                }
+            }
+            environment {
+                TMPDIR = './.tmp'
+            }
+            steps {
+                sh '''
+                    mkdir -p "$TMPDIR"
+                    test -f build/index.html
+                    npm test
+                '''
+            }
         }
     }
-    steps {
-        sh '''
-            export NPM_CONFIG_GLOBALCONFIG=/dev/null
-            export npm_config_cache=$NPM_CONFIG_CACHE
-            mkdir -p "$NPM_CONFIG_CACHE"
-
-            npm install netlify-cli
-            npx netlify --version
-        '''
-    }
 }
-
