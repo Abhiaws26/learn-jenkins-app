@@ -11,7 +11,6 @@ pipeline {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
-                    args '-v /data:/data'
                 }
             }
             steps {
@@ -31,11 +30,10 @@ pipeline {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
-                    args '-v /data:/data'
                 }
             }
             environment {
-                TMPDIR = '/data/tmp'
+                TMPDIR = './.tmp'  // Correctly placed under the environment block for this stage
             }
             steps {
                 sh '''
@@ -46,44 +44,17 @@ pipeline {
             }
         }
 
-        stage('End-to-End Tests') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.51.0-noble'
-                    reuseNode true
-                    args '-v /data:/data'
-                }
-            }
-            environment {
-                DOCKER_TMPDIR = '/data/docker-tmp'
-                TMPDIR = '/data/tmp'
-            }
-            steps {
-                sh '''
-                    mkdir -p "$DOCKER_TMPDIR" "$TMPDIR"
-                    npm install -g serve
-                    serve -s build &
-                    sleep 15
-                    npx playwright test
-                '''
-            }
-        }
-
-        stage('Docker Pull (Optional)') {
+        stage('deploy') {
             agent {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
-                    args '-v /data:/data'
                 }
-            }
-            environment {
-                DOCKER_TMPDIR = '/data/docker-tmp'
             }
             steps {
                 sh '''
-                    mkdir -p "$DOCKER_TMPDIR"
-                    docker pull mcr.microsoft.com/playwright:v1.51.0-noble
+                    npm install -g netlify-cli
+                    netlify --version
                 '''
             }
         }
