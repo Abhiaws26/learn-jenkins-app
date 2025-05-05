@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18
 
 # Ensure npm cache has correct permissions
 RUN mkdir -p /root/.npm && chown -R node:node /root/.npm
