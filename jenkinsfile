@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        NPM_CONFIG_CACHE = './.npm-cache'
+    }
+
     stages {
         stage('deploy') {
             agent {
@@ -11,9 +15,22 @@ pipeline {
             }
             steps {
                 sh '''
+                    # Ensure cache directory is writable and exists
+                    mkdir -p "$NPM_CONFIG_CACHE"
+
+                    # Override npm global config to avoid permission issues
                     export NPM_CONFIG_GLOBALCONFIG=/dev/null
+
+                    # Tell npm to use our writable cache directory
+                    export npm_config_cache=$NPM_CONFIG_CACHE
+
+                    # Install CLI locally (NOT globally)
                     npm install netlify-cli
+
+                    # Use it via npx
                     npx netlify --version
+
+                    # Example: npx netlify deploy --site <site-id> --auth $NETLIFY_AUTH_TOKEN --prod
                 '''
             }
         }
