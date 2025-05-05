@@ -1,21 +1,22 @@
-pipeline{
+pipeline {
     agent any
-    stages{
-        stage('deploy'){
-            agent{
-                docker{
+
+    stages {
+        stage('deploy') {
+            agent {
+                docker {
                     image 'node:18'
                     reuseNode true
-                    
                 }
             }
-            steps{
+            steps {
                 sh '''
-                     npm install netlify-cli
+                    export NPM_CONFIG_GLOBALCONFIG=/dev/null
+                    npm install netlify-cli
                     npx netlify --version
                 '''
             }
         }
     }
-    
 }
+
