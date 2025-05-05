@@ -27,7 +27,7 @@ pipeline {
         }
         stage('approval'){
             steps{
-                timeout (time : 3 , timeout units : minutes){
+                timeout (time : 3 , unit : 'MINUTES'){
                 input message: 'DO YOU WISH TO TEST THE PIPELINE ', ok: 'YES , I AM SURE'
                 }
             }
