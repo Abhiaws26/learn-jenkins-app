@@ -1,7 +1,8 @@
 FROM node:18-alpine
 
 # Ensure npm cache has correct permissions
-RUN mkdir -p /home/node/.npm && chown -R node:node /home/node/.npm
+RUN mkdir -p /root/.npm && chown -R node:node /root/.npm
+
 
 # Set working directory
 WORKDIR /app

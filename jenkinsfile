@@ -18,6 +18,7 @@ pipeline {
                     ls -la
                     npm --version
                     node --version
+                    npm config set cache /tmp/.npm-cache --global  // Set cache to a writable directory
                     npm ci
                     npm run build
                     ls -la
@@ -33,7 +34,7 @@ pipeline {
                 }
             }
             environment {
-                TMPDIR = './.tmp'  // Correctly placed under the environment block for this stage
+                TMPDIR = './.tmp'
             }
             steps {
                 sh '''
@@ -53,11 +54,12 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install -g netlify-cli
+                    npm install -g netlify-cli --unsafe-perm  // Use --unsafe-perm to avoid permission issues
                     netlify --version
                 '''
             }
         }
     }
 }
+
 
