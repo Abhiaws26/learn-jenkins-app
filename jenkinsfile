@@ -22,32 +22,40 @@ pipeline {
                 '''
             }
         }
-        stage('test'){
-            agent{
-                docker{
+        stage('test') {
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
-            steps{
+            steps {
                 sh '''
                     test -f build/index.html
                     npm test
                 '''
             }
         }
-        stage('E2E'){
-            agent{
-                docker{
+        stage('E2E') {
+            agent {
+                docker {
                     image 'mcr.microsoft.com/playwright:v1.52.0-noble'
                     reuseNode true
                 }
             }
-            steps{
+            steps {
                 sh '''
+                    # Install serve globally
                     npm install -g serve
-                    serve -s build 
-                    npx playwright test
+                    
+                    # Serve the build folder on all interfaces to be accessible to Playwright
+                    serve -s build -l 0.0.0.0:5000 &
+
+                    # Wait for a few seconds to ensure the server is up and running
+                    sleep 5
+
+                    # Run Playwright tests (ensure Playwright is installed)
+                    npx playwright test --project=chromium
                 '''
             }
         }
