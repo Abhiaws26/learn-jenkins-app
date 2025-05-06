@@ -16,6 +16,8 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
+                    # Fix permissions of the npm cache directory
+                    mkdir -p /tmp/.npm && chown -R 1000:1000 /tmp/.npm
                     npm ci
                     npm run build
                     ls -la
@@ -47,6 +49,9 @@ pipeline {
                 sh '''
                     # Install serve globally
                     npm install -g serve
+                    
+                    # Fix permissions for npm global directory
+                    mkdir -p /usr/local/share/.npm-global && chown -R 1000:1000 /usr/local/share/.npm-global
                     
                     # Serve the build folder on all interfaces to be accessible to Playwright
                     serve -s build -l 0.0.0.0:5000 &
