@@ -10,14 +10,14 @@ pipeline {
             }
             environment {
                 NPM_CONFIG_CACHE = '/tmp/.npm'  // Set npm cache to a writable directory
+                NPM_CONFIG_PREFIX = '/home/jenkins/.npm-global' // Set global npm prefix to a writable location
             }
             steps {
                 sh '''
                     ls -la
                     node --version
                     npm --version
-                    # Fix permissions of the npm cache directory
-                    mkdir -p /tmp/.npm && chown -R 1000:1000 /tmp/.npm
+                    mkdir -p /tmp/.npm
                     npm ci
                     npm run build
                     ls -la
@@ -47,11 +47,11 @@ pipeline {
             }
             steps {
                 sh '''
-                    # Install serve globally
-                    npm install -g serve
+                    # Install serve globally in a writable directory
+                    npm install -g serve --prefix /home/jenkins/.npm-global
                     
-                    # Fix permissions for npm global directory
-                    mkdir -p /usr/local/share/.npm-global && chown -R 1000:1000 /usr/local/share/.npm-global
+                    # Ensure the correct npm global directory is in the PATH
+                    export PATH=$PATH:/home/jenkins/.npm-global/bin
                     
                     # Serve the build folder on all interfaces to be accessible to Playwright
                     serve -s build -l 0.0.0.0:5000 &
