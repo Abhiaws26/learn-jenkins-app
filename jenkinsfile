@@ -25,14 +25,6 @@ pipeline {
                 '''
             }
         }
-        stage('approval'){
-            steps{
-                timeout (time : 3 , unit : 'MINUTES'){
-                input message: 'DO YOU WISH TO TEST THE PIPELINE ', ok: 'YES , I AM SURE'
-                }
-            }
-        }
-
         stage('Test Build Output') {
             agent {
                 docker {
