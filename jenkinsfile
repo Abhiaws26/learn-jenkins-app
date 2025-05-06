@@ -9,18 +9,24 @@ pipeline {
                 }
             }
             environment {
-                NPM_CONFIG_CACHE = '/tmp/.npm'  // Set npm cache to a writable directory
-                NPM_CONFIG_PREFIX = '/tmp/.npm-global' // Set global npm prefix to a writable location
+                // Set the npm cache to a writable directory
+                NPM_CONFIG_CACHE = '/tmp/.npm'
+                // Set the npm global installation directory to a writable location
+                NPM_CONFIG_PREFIX = '/tmp/.npm-global'
             }
             steps {
                 sh '''
-                    ls -la
+                    # Ensure /tmp/.npm and /tmp/.npm-global are writable
+                    mkdir -p /tmp/.npm
+                    mkdir -p /tmp/.npm-global
+
+                    # Check npm versions and directories
                     node --version
                     npm --version
-                    mkdir -p /tmp/.npm
+
+                    # Install dependencies without causing permission issues
                     npm ci
                     npm run build
-                    ls -la
                 '''
             }
         }
@@ -33,6 +39,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    # Check if the build output exists
                     test -f build/index.html
                     npm test
                 '''
@@ -49,11 +56,11 @@ pipeline {
                 sh '''
                     # Install serve globally in a writable directory
                     npm install -g serve --prefix /tmp/.npm-global
-                    
+
                     # Ensure the correct npm global directory is in the PATH
                     export PATH=$PATH:/tmp/.npm-global/bin
-                    
-                    # Serve the build folder on all interfaces to be accessible to Playwright
+
+                    # Serve the build folder on all interfaces
                     serve -s build -l 0.0.0.0:5000 &
 
                     # Wait for a few seconds to ensure the server is up and running
