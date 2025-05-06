@@ -10,7 +10,7 @@ pipeline {
             }
             environment {
                 NPM_CONFIG_CACHE = '/tmp/.npm'  // Set npm cache to a writable directory
-                NPM_CONFIG_PREFIX = '/home/jenkins/.npm-global' // Set global npm prefix to a writable location
+                NPM_CONFIG_PREFIX = '/tmp/.npm-global' // Set global npm prefix to a writable location
             }
             steps {
                 sh '''
@@ -48,10 +48,10 @@ pipeline {
             steps {
                 sh '''
                     # Install serve globally in a writable directory
-                    npm install -g serve --prefix /home/jenkins/.npm-global
+                    npm install -g serve --prefix /tmp/.npm-global
                     
                     # Ensure the correct npm global directory is in the PATH
-                    export PATH=$PATH:/home/jenkins/.npm-global/bin
+                    export PATH=$PATH:/tmp/.npm-global/bin
                     
                     # Serve the build folder on all interfaces to be accessible to Playwright
                     serve -s build -l 0.0.0.0:5000 &
