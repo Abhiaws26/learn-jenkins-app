@@ -9,22 +9,15 @@ pipeline {
                 }
             }
             environment {
-                // Set the npm cache to a writable directory
                 NPM_CONFIG_CACHE = '/tmp/.npm'
-                // Set the npm global installation directory to a writable location
                 NPM_CONFIG_PREFIX = '/tmp/.npm-global'
             }
             steps {
                 sh '''
-                    # Ensure /tmp/.npm and /tmp/.npm-global are writable
                     mkdir -p /tmp/.npm
                     mkdir -p /tmp/.npm-global
-
-                    # Check npm versions and directories
                     node --version
                     npm --version
-
-                    # Install dependencies without causing permission issues
                     npm ci
                     npm run build
                 '''
@@ -39,7 +32,6 @@ pipeline {
             }
             steps {
                 sh '''
-                    # Check if the build output exists
                     test -f build/index.html
                     npm test
                 '''
@@ -55,9 +47,12 @@ pipeline {
             steps {
                 sh '''
                     export NPM_CONFIG_CACHE=/tmp/npm-cache
-                    npm install  serve
-                    node_modules/.bin/serve -s build 
+                    npm install serve
+                    nohup npx serve -s build > serve.log 2>&1 &
+                    SERVE_PID=$!
+                    sleep 5
                     npx playwright test
+                    kill $SERVE_PID
                 '''
             }
         }
