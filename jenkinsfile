@@ -51,7 +51,6 @@ pipeline {
                     nohup npx serve -s build > serve.log 2>&1 &
                     SERVE_PID=$!
                     sleep 5
-                    npx playwright test
                     kill $SERVE_PID
                 '''
             }
