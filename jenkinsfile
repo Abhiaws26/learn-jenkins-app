@@ -54,6 +54,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    export NPM_CONFIG_CACHE=/tmp/npm-cache
                     npm install  serve
                     node_modules/.bin/serve -s build 
                     npx playwright test
