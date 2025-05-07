@@ -23,6 +23,7 @@ pipeline {
                 '''
             }
         }
+
         stage('test') {
             parallel {
                 stage('unit tests') {
@@ -39,6 +40,7 @@ pipeline {
                         '''
                     }
                 }
+
                 stage('E2E') {
                     agent {
                         docker {
@@ -59,7 +61,23 @@ pipeline {
                 }
             }
         }
+
+        stage('deploy') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version
+                '''
+            }
+        }
     }
+
     post {
         always {
             archiveArtifacts artifacts: '**/screenshot.png', allowEmptyArchive: true
