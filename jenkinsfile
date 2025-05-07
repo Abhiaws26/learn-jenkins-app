@@ -54,20 +54,9 @@ pipeline {
             }
             steps {
                 sh '''
-                    # Install serve globally in a writable directory
-                    npm install -g serve --prefix /tmp/.npm-global
-
-                    # Ensure the correct npm global directory is in the PATH
-                    export PATH=$PATH:/tmp/.npm-global/bin
-
-                    # Serve the build folder on all interfaces
-                    serve -s build -l 0.0.0.0:5000 &
-
-                    # Wait for a few seconds to ensure the server is up and running
-                    sleep 5
-
-                    # Run Playwright tests (ensure Playwright is installed)
-                    npx playwright test --project=chromium
+                    npm install  serve
+                    node_modules/.bin/serve -s build 
+                    npx playwright test
                 '''
             }
         }
