@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment{
+        NETLIFY_SITE_ID = '2a2e08c5-e855-4c87-922e-1e567dd1af68'  
+          }
+
     stages {
         stage('build') {
             agent {
@@ -83,6 +87,7 @@ pipeline {
                     
                     # Print the global npm binary path to debug
                     echo "NPM global bin path: $(npm bin -g)"
+                    echo "Deploying to production .Site Id:$NETLIFY_SITE_ID"
                 '''
             }
         }
