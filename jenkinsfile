@@ -25,38 +25,32 @@ pipeline {
         }
 
         stage('test') {
-            parallel {
-                stage('unit tests') {
-                    agent {
-                        docker {
-                            image 'node:18-alpine'
-                            reuseNode true
-                        }
-                    }
-                    steps {
-                        sh '''
-                            test -f build/index.html
-                            npm test
-                        '''
-                    }
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
                 }
+            }
+            steps {
+                sh '''
+                    test -f build/index.html
+                    npm test
+                '''
+            }
 
-                stage('E2E') {
-                    agent {
-                        docker {
-                            image 'mcr.microsoft.com/playwright:v1.52.0-noble'
-                            reuseNode true
+            post {
+                always {
+                    script {
+                        docker.image('mcr.microsoft.com/playwright:v1.52.0-noble').inside('--entrypoint=""') {
+                            sh '''
+                                export NPM_CONFIG_CACHE=/tmp/npm-cache
+                                npm install serve
+                                nohup npx serve -s build > serve.log 2>&1 &
+                                SERVE_PID=$!
+                                sleep 5
+                                kill $SERVE_PID
+                            '''
                         }
-                    }
-                    steps {
-                        sh '''
-                            export NPM_CONFIG_CACHE=/tmp/npm-cache
-                            npm install serve
-                            nohup npx serve -s build > serve.log 2>&1 &
-                            SERVE_PID=$!
-                            sleep 5
-                            kill $SERVE_PID
-                        '''
                     }
                 }
             }
