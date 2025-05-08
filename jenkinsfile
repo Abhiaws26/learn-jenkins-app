@@ -69,9 +69,10 @@ pipeline {
                 }
             }
             environment {
+                HOME = '/tmp'
                 NPM_CONFIG_CACHE = '/tmp/.npm'
                 NPM_CONFIG_PREFIX = '/tmp/.npm-global'
-                PATH = "/tmp/.npm-global/bin:$PATH"
+                PATH = '/tmp/.npm-global/bin:$PATH'
             }
             steps {
                 sh '''
