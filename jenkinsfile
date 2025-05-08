@@ -60,21 +60,28 @@ pipeline {
                 '''
             }
         }
-        stage('deploy'){
-            agent{
-                docker{
+
+        stage('deploy') {
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
-            steps{
+            environment {
+                NPM_CONFIG_CACHE = '/tmp/.npm'
+                NPM_CONFIG_PREFIX = '/tmp/.npm-global'
+                PATH = "/tmp/.npm-global/bin:$PATH"
+            }
+            steps {
                 sh '''
                     echo "Deploying the pipeline"
-                    npm install -g netlify-cli
+                    mkdir -p $NPM_CONFIG_CACHE
+                    mkdir -p $NPM_CONFIG_PREFIX/bin
+                    npm install -g netlify-cli --unsafe-perm
                     netlify --version
                 '''
             }
-
         }
     }
 
