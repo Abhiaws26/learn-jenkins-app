@@ -71,6 +71,7 @@ pipeline {
             }
             steps {
                 sh '''
+		    echo 'installing netlify cli'
                     npm install -g netlify-cli
                     netlify --version
                 '''
