@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage('build') {
             agent {
@@ -37,7 +38,6 @@ pipeline {
                     npm test
                 '''
             }
-
             post {
                 always {
                     script {
@@ -53,22 +53,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-
-        stage('deploy') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "installing netlify-cli"
-                    npm install -g netlify-cli --unsafe-perm
-                    netlify --version
-                '''
             }
         }
     }
