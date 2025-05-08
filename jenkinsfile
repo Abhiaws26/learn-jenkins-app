@@ -38,21 +38,26 @@ pipeline {
                     npm test
                 '''
             }
-            post {
-                always {
-                    script {
-                        docker.image('mcr.microsoft.com/playwright:v1.52.0-noble').inside('--entrypoint=""') {
-                            sh '''
-                                export NPM_CONFIG_CACHE=/tmp/npm-cache
-                                npm install serve
-                                nohup npx serve -s build > serve.log 2>&1 &
-                                SERVE_PID=$!
-                                sleep 5
-                                kill $SERVE_PID
-                            '''
-                        }
-                    }
+        }
+
+        stage('e2e') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.52.0-noble'
+                    reuseNode true
                 }
+            }
+            environment {
+                NPM_CONFIG_CACHE = '/tmp/npm-cache'
+            }
+            steps {
+                sh '''
+                    npm install serve
+                    nohup npx serve -s build > serve.log 2>&1 &
+                    SERVE_PID=$!
+                    sleep 5
+                    kill $SERVE_PID
+                '''
             }
         }
     }
