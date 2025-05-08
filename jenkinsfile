@@ -72,7 +72,7 @@ pipeline {
                 HOME = '/tmp' // Prevent sharp from writing to root-owned /.npm
                 NPM_CONFIG_CACHE = '/tmp/.npm'
                 NPM_CONFIG_PREFIX = '/tmp/.npm-global'
-                PATH = '/tmp/.npm-global/bin:$PATH'
+                PATH = '/tmp/.npm-global/bin:$PATH' // Ensure global npm binaries are in PATH
             }
             steps {
                 sh '''
@@ -80,8 +80,12 @@ pipeline {
                     mkdir -p $NPM_CONFIG_CACHE
                     mkdir -p $NPM_CONFIG_PREFIX/bin
                     npm install -g netlify-cli --unsafe-perm
-                    echo "Netlify version:"
-                    netlify --version  # To verify that netlify-cli is installed correctly
+                    
+                    # Print the global npm binary path to debug
+                    echo "NPM global bin path: $(npm bin -g)"
+                    
+                    # Now try running Netlify
+                    netlify --version
                 '''
             }
         }
