@@ -83,9 +83,6 @@ pipeline {
                     
                     # Print the global npm binary path to debug
                     echo "NPM global bin path: $(npm bin -g)"
-                    
-                    # Now try running Netlify
-                    netlify --version
                 '''
             }
         }
